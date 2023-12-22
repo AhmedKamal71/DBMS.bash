@@ -3,14 +3,20 @@
 mkdir DBMS 2>> ./.error.log
 echo "Welcom To Our Database Ahmed!"
 
-MainMenu() { 		 # Print Main Menu To User Once We Run The Script.
+#----------------------------------------------------------- Main Menu ----------------------------------------------------------------------------------
 
-	echo "1) Create Database."
-	echo "2) List Databases."
-	echo "3) Connect To Database."
-	echo "4) Drop Ddatabase."
-	echo "5) Exit"
-
+MainMenu() {	# Print Main Menu To User Once We Run The Script.
+        
+	
+	echo " _______________________________"
+        echo "|           Main Menu           |"
+	echo "|_______________________________|"
+	echo "|1) Create Database.            |"
+	echo "|2) List Databases.             |"            
+	echo "|3) Connect To Database.        |"
+	echo "|4) Drop Ddatabase.             |"
+	echo "|5) Exit                        |"
+	echo "|_______________________________| "
 	echo "Please Enter Your Choice: "
 	read choice
 	case $choice in
@@ -28,19 +34,24 @@ MainMenu() { 		 # Print Main Menu To User Once We Run The Script.
 	esac 
 }
 
+#---------------------------------------------------------------- Table Menu -----------------------------------------------------------------------------
 
 T_menu(){                  # Print Table Menu Once We Connect To Database
 
-
-	echo "1) Create Table."
-	echo "2) List Tables."
-	echo "3) Drop Table"
-	echo "4) Insert Into Table."
-	echo "5) Select From Table."
-	echo "6) Delete From Table."
-	echo "7) Update Table."
-	echo "8) Back To Main Menu"
-	echo "9) Exit"
+	echo " _______________________________"
+	echo "|          Table Menu           |"
+	echo "|_______________________________|"
+	echo "|1) Create Table.               |"
+	echo "|2) List Tables.                |"
+	echo "|3) Drop Table                  |"
+	echo "|4) Insert Into Table.          |"
+	echo "|5) Select From Table.          |"
+	echo "|6) Delete From Table.          |"
+	echo "|7) Update Table.               |"
+	echo "|8) View Table.                 |"
+	echo "|9) Back To Main Menu           |"
+	echo "|10) Exit                       |"
+	echo "|_______________________________|"
 
 	echo "Please Enter Your Choice: "
 	read choice
@@ -59,18 +70,19 @@ T_menu(){                  # Print Table Menu Once We Connect To Database
 			;;
 		7) updateTb
 			;;
-		8) MainMenu
+		8) viewTb
 			;;
-		9) exit
+		9) MainMenu
+			;;
+		10) exit
 			;;
 		*) echo "Invalid Choice, Please Enter Other Choice! " ;T_menu;
 	esac 
 
-
-
-
 }
 
+
+#------------------------------------------------------------- Create Database -------------------------------------------------------------------------------------
 
 createDB() {
 
@@ -88,9 +100,9 @@ createDB() {
 	fi
 	
 	MainMenu
-
 }
 
+#------------------------------------------------------------ List All Databases -----------------------------------------------------------------------------------
 
 listDB() {
 
@@ -101,8 +113,9 @@ listDB() {
 }
 
 
+#------------------------------------------------------------ Connect To Specific DataBase ----------------------------------------------------------------------------
 
-connectDB() {
+connectDB(){
 
 	echo "Please, Enter The name Of DB To Connect It: "
 	read choice
@@ -118,15 +131,12 @@ connectDB() {
 		fi
 	else
 		echo "Database Doesn't Exist, Try Again! "
-		read choice
+		MainMenu
 	fi
 
 }
 
-
-
-
-
+#-------------------------------------------------------- Drop Specific Database ----------------------------------------------------------------------------------
 
 dropDB() {
 
@@ -143,14 +153,12 @@ dropDB() {
 		echo "This Database Doesn't Exist"
 	fi
 	MainMenu
-
 }
 
 
-
+#-------------------------------------------------------------- Create Table --------------------------------------------------------------------
 
 createTb(){
-
 
 	echo "Please Enter The Name Of The Table: "
 	read Tname
@@ -159,7 +167,6 @@ createTb(){
 		echo "Table $Tname is already exist, try again!"
 		T_menu
 	fi
-		
 		echo "Enter the number of fields: "
 		read fNum
 		fSp="|"
@@ -184,7 +191,7 @@ createTb(){
 					;;
 			esac
 			if [[ $pKey == "" ]]; then
-				echo "Is This field a primary key? "
+				echo "Choose This field as a primary key? "
 				echo "1) Yes"
 				echo "2) No"
 				read prim
@@ -206,15 +213,12 @@ createTb(){
 			fi
 			((count++))
 		done
-
-
-
-		touch .$Tname
+		touch .$Tname             # Create a hidden file to put each field and data type in it
 		echo -e $data >> .$Tname
 		touch $Tname
-		echo "-----------------------------------" >>$Tname
+		echo "-------------------------------------|"  >>$Tname
 		echo -e $temp >> $Tname
-		echo "-----------------------------------" >>$Tname
+		echo "-------------------------------------|"  >>$Tname
 		if [[ $? == 0 ]]; then
 			echo "Table Created Succesfully!"
 			T_menu
@@ -222,28 +226,42 @@ createTb(){
 			echo "Failed To Create $Tname Table"
 			T_menu
 		fi
-
 	T_menu
 }
 
 
+#------------------------------------------------------------------- View Table Content ------------------------------------------------------------------------ 
+
+viewTb(){
+
+        echo "Enter Table's Name To View: "
+        read tName
+        if [ -f $tName ]; then
+                curr=$(pwd)
+                cat $curr/$tName
+                T_menu
+        else
+                echo "$tName Is Not Exist!"
+                T_menu
+        fi
+}
+
+
+#------------------------------------------------------------------- List All Tables In Specific Database --------------------------------------------------------
 
 
 listTb(){
 
-
 	current=$(pwd)
 	ls $current
 	T_menu
-
 }
 
 
-
+#------------------------------------------------------------------- Drop Table -----------------------------------------------------------------------------------
 
 
 dropTb(){
-
 
 	echo "Please, Enter the name of table to delete: "
 	read dTable
@@ -259,14 +277,13 @@ dropTb(){
 		echo "There's not a table with this name"
 	fi
 	T_menu
-
 }
 
 
+#----------------------------------------------------------------- Insert Into Table ------------------------------------------------------------------------------
 
 
 insertTb(){
-
 
 	echo "Enter the name of table to insert in: "
 	read tName
@@ -280,8 +297,7 @@ insertTb(){
 			fType=$(cut -d '|' -f2 < .$tName | sed -n "${i}p")
 			pKey=$(cut -d '|' -f3 < .$tName | sed -n "${i}p")
 			
-			echo "Table $tName's Fields are: $fName with $fType data type"
-
+			echo "Enter $fName with |$fType| data type: "
 			read input
 			
 			if [[ $fType == "int" ]]; then
@@ -299,7 +315,7 @@ insertTb(){
 
 			if [[ $pKey == "PK" ]]; then
 				while [[ true ]]; do
-					if [[ $input =~ ^[`awk 'BEGIN{FS="|" ; ORS=" "}{if(NR != 1)print $(('$i'-1))}' $tName`]$ ]]; then
+					if [[ $input =~ ^[`awk 'BEGIN{FS="|" ; ORS=" "}{if(NR != 1)print $(('$i'-1))}' $tName`]$ ]]; then      # Check For Existing PK
 						echo "Invalid Primary Key "
 					else
 						break;
@@ -307,107 +323,154 @@ insertTb(){
 					read input
 				done
 			fi
-			if [[ $i == fNum ]]; then
-				row=$row$input
+			if [[ $i == $fNum ]]; then
+				row=$row$input$rSp
 			else
 				row=$row$input$fSp
 			fi
 		done
-		echo -e $row"\n" >> $tName
-		echo "-----------------------------------" >> $tName
+		echo -e $row"\c" >> $tName
+		echo "-------------------------------------|"  >> $tName
 		if [[ $? == 0 ]]; then
 			echo "Data Inserted Successfully"
 		else
 			echo "error inserting"
 		fi
-		
-						
-
-
 	else
-	
 		echo "Sory, Table $tName isn't exist !!"
 	fi
-	row=""
+	row=""               
 	T_menu
-
 }
 
 
+#------------------------------------------------------------------------------ Update Table ----------------------------------------------------------------
 
 
 updateTb(){
 
-
-	echo "Enter The Name OF Table To Update: "
-	read tName
-	if [ -f $tName ]; then
-		echo "Enter The Name of The Field To Update in: "
-		read old_fInput
-		old_field_index=$(awk 'BEGIN{FS="|"}{if(NR==1){for(i=1;i<=NF;i++){if($i=="'$old_fInput'") print i}}}' $tName)
-		if [[ $old_field_index == "" ]]; then
-			echo "This Field Doesn't Exist"
+  echo -e "Enter The Name Of The Table To Update In:  "
+  read tName
+  if [ -f $tName ]; then
+  	echo "Enter the name of the PK field: "
+  	read key_field
+  	fid=$(awk 'BEGIN{FS="|"}{if(NR==2){for(i=1;i<=NF;i++){if($i=="'$key_field'") print i}}}' $tName)     # Get The PK Field's Index
+  	if [[ $fid == "" ]]; then
+    		echo "This $key_field'name doesn't exist, please enter an other name"
+    		T_menu
+  	else
+    		echo "Enter The Value To Use As A Key To Update With: "
+    		read val
+    		res=$(awk 'BEGIN{FS="|"}{if ($'$fid'=="'$val'") print $'$fid'}' $tName 2>>./.error.log)       # Get The Primary Key
+    		if [[ $res == "" ]]; then
+      			echo "Value Not Found!"
 			T_menu
-		else
-			echo "Enter the value you want to update: "
-			read old_vInput
-			oldV_field=$(awk 'BEGIN{FS="|"}{if ($'$old_field_index'=="'$old_vInput'") print $'$old_field_index'}' $tName 2>>./.error.log)
-			if [[ $oldV_field == "" ]]; then
-				echo "This Value Doesn't Exist!!"
-				T_menu
-			else
-				echo "Enter The Name Of The New Value's Field: "
-				read new_fInput
-				new_field_index=$(awk 'BEGIN{FS="|"}{if(NR==1){for(i=1;i<=NF;i++){if($i=="'$new_fInput'") print i}}}' $tName)
-				if [[ $new_field_index == "" ]]; then
-					echo "This Field Doesn't Exist!!"
-					T_menu
-				else
-					echo "Enter The New Value: "
-					read new_vInput
-					row_index=$(awk 'BEGIN{FS="|"}{if ($'$old_field_index'=="'$old_vInput'") print NR}' $tName 2>>./.error.log)
-					old_value=$(awk 'BEGIN{FS="|"}{if(NR=='$row_index'){for(i=1;i<=NF;i++){if(i=='$new_field_index') print $i}}}' $tName 2>>./.error.log)									   echo $old_value
-					sed -i ''$row_index's/'$old_value'/'$new_vInput'/g' $tName 2>>./.error.log
-					echo "Value Updated Successfully!"
-					T_menu
+    		else
+      			echo "Enter The Field To Update In: "
+      			read target_field
+      			setFid=$(awk 'BEGIN{FS="|"}{if(NR==2){for(i=1;i<=NF;i++){if($i=="'$target_field'") print i}}}' $tName)    # Get The Index Of Field We Want To Update In
+      			if [[ $setFid == "" ]]; then
+        			echo "$target_field's Name Not Found!!"
+        			T_menu
+      			else
+        			echo "Enter The new Value: "
+        			read newValue
+        			NR=$(awk 'BEGIN{FS="|"}{if ($'$fid' == "'$val'") print NR}' $tName 2>>./.error.log)               # Get Number Of The Row In Which The Old Value
+        			oldValue=$(awk 'BEGIN{FS="|"}{if(NR=='$NR'){for(i=1;i<=NF;i++){if(i=='$setFid') print $i}}}' $tName 2>>./.error.log)   # Get The Old Value
+        			sed -i ''$NR's/'$oldValue'/'$newValue'/g' $tName 2>>./.error.log        # Replce Old Value With New Value
+				if [[ $? == 0 ]]; then
+        				echo "Row Updated Successfully"
+        				T_menu
 				fi
 			fi
+
 		fi
-	else
-		echo "This Table Doesn't Exist!!"
 	fi
 
+else
+	echo "No Such A Table With $tName'name"
+  fi
 }
 
 
-
-MainMenu
-
+#------------------------------------------------------------------------ Delete From Table -------------------------------------------------------------------
 
 
+delFromTb() {
+  echo "Enter Table Name To Delete From It: "
+  read tName
+  if [ -f $tName ]; then
+  	echo "Enter The Key Field To Use With Deleting: "
+	read key_field
+  	f_index=$(awk 'BEGIN{FS="|"}{if(NR==2){for(i=1;i<=NF;i++){if($i=="'$key_field'") print i}}}' $tName)
+  	if [[ $f_index == "" ]]; then
+    		echo "Not Found"
+		T_menu
+  	else
+    		echo "Enter Value To Delete Its Row: "
+    		read val
+    		res=$(awk 'BEGIN{FS="|"}{if ($'$f_index'=="'$val'") print $'$f_index'}' $tName 2>>./.error.log)
+    		if [[ $res == "" ]]; then
+			echo "Value Not Found"
+      			T_menu
+    		else
+      			NR=$(awk 'BEGIN{FS="|"}{if ($'$f_index'=="'$val'") print NR}' $tName 2>>./.error.log)
+      			sed -i ''$NR'd' $tName 2>>./.error.log
+			if [[ $? == 0 ]]; then
+      				echo "Row Deleted Successfully"
+				T_menu
+			else
+				echo "Failed To Delete!"
+				T_menu
+			fi   
+		fi
+	fi
+ else
+	echo "No Such A Table With This Name!"
+	T_menu
+ fi
+}
+
+
+#--------------------------------------------------------------------- Select From Table -----------------------------------------------------------------------
 
 
 
+selFromTb(){
+
+  echo "Enter Table Name To Select From It: "
+  read tName
+  if [ -f $tName ]; then
+        echo "Enter The Key Field To Use With Selecting: "
+        read key_field
+        f_index=$(awk 'BEGIN{FS="|"}{if(NR==2){for(i=1;i<=NF;i++){if($i=="'$key_field'") print i}}}' $tName)     # Get The Index Of The Key Field To Use It In Selecting Row
+        if [[ $f_index == "" ]]; then
+                echo "Not Found"
+                T_menu
+        else
+                echo "Enter Value To Select Its Row: "
+                read val
+                res=$(awk 'BEGIN{FS="|"}{if ($'$f_index'=="'$val'") print $'$f_index'}' $tName 2>>./.error.log)    # Check if the value in the selected field
+                if [[ $res == "" ]]; then
+                        echo "Value Not Found"
+                        T_menu
+                else
+                        NR=$(awk 'BEGIN{FS="|"}{if ($'$f_index'=="'$val'") print NR}' $tName 2>>./.error.log)       # Get Row Number Of The Key Value
+                        awk -F'|' -v nr="$NR" 'NR == nr {print}' "$tName" 2>>./.error.log                           # Print The Whole Row
+                        if [[ $? == 0 ]]; then
+                                echo "Row Selected Successfully"
+                                T_menu
+                        else
+                                echo "Failed To Select!"
+                                T_menu
+                        fi   
+                fi
+        fi
+ else
+        echo "No Such A Table With This Name!"
+        T_menu
+ fi
+}
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+MainMenu  
